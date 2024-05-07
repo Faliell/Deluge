@@ -1,0 +1,17 @@
+orgID = 693069114;
+headersMap = Map();
+paramsMap = Map();
+configMap = Map();
+headersMap.put("ZANALYTICS-ORGID",orgID);
+configMap.put("responseFormat","json");
+paramsMap.put("CONFIG",configMap.toString());
+workspaceID = 2024347000000004001;
+viewID = 2024347000030400002;
+response = invokeurl
+[
+	url :"https://analyticsapi.zoho.com/restapi/v2/workspaces/" + workspaceID + "/views/" + viewID + "/data"
+	type :GET
+	parameters:paramsMap
+	headers:headersMap
+	connection:"analytics_oauth_connection"
+];
