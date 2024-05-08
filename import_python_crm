@@ -1,0 +1,45 @@
+from datetime import datetime
+import pandas as pd
+import requests
+import json
+from concurrent.futures import ThreadPoolExecutor
+
+start_time = datetime.now()
+print('Start: ', start_time)
+
+nifs = pd.read_csv("NIFs_Duplicados_com_MyHyundai.csv")
+print(nifs.head())
+
+
+lista_nif = nifs['NIF'].tolist()
+print(lista_nif)
+
+def get_url(body_request, module_name):
+    request_body = {}
+    request_body['module'] = module_name
+    request_body['data'] = body_request
+
+    url = "https://www.zohoapis.com/crm/v2/functions/verificar_nif_duplicado/actions/execute?auth_type=apikey&zapikey=***********************"
+    zoho_headers = {'Content-type': 'application/json', 'Accept': '*/*'}
+    response = requests.post(url, data=json.dumps(request_body).encode('utf-8'), headers=zoho_headers)
+
+    return response.json()
+
+def concurrency_post(body_list, module_name, max_workers=20):
+    module_name_list = []
+    for mn in body_list:
+        module_name_list.append(module_name)
+
+    with ThreadPoolExecutor(max_workers) as pool:
+        return list(pool.map(get_url, body_list, module_name_list))
+
+
+
+post_result = concurrency_post(lista_nif, 'Contactos_Importador')
+print(post_result[0]["code"])
+
+
+end_time = datetime.now()
+import_duration = (end_time - start_time).total_seconds()
+print('End: ', end_time)
+print('Timming: ', import_duration, 'seg')
