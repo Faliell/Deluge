@@ -1,0 +1,10 @@
+crmAPIRequestMap = crmAPIRequest.toMap();
+request_body = crmAPIRequestMap.get("body");
+nif = request_body.getJSON("data");
+// sendmail
+// [
+// 	from :zoho.adminuserid
+// 	to :"fabioschapowal@loba.com"
+// 	subject :"verificar_NIF_duplicado"
+// 	message :nif
+// ]
