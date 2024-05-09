@@ -1,0 +1,58 @@
+startTime = zoho.currenttime;
+info startTime;
+cvidVista = 366444000038414043;
+modulo = "EligileVirtualOffers";
+pages = {1};
+porPage = 15;
+totalRec = 0;
+listbulk = list();
+for each  page in pages
+{
+	records = zoho.crm.getRecords(modulo,page,porPage,{"cvid":cvidVista});
+	for each  record in records
+	{
+		id = record.get("id");
+		id_oferta = record.get("Name").subString(13);
+		cartao = record.get("Name").subString(0,13);
+		criteria = "\"CARD_NUMBER\"='" + cartao + "' and \"EXTERN_ID_OFFER\"=" + id_oferta;
+		// 		criteria = "\"CARD_NUMBER\"='" + 5602208860162 + "' and \"EXTERN_ID_OFFER\"=" + 00111477;
+		records = standalone.generic_getRecordsFromAnalytics1(125666000000002005,125666000000788002,"",criteria).toList();
+		if(records.size() == 0)
+		{
+			info records;
+			info "não existe na API";
+			mp = Map();
+			mp.put("id",id);
+			mp.put("Verifica_Id",TRUE);
+			mp.put("Cartao_id_nao_existe",TRUE);
+			info mp;
+			listbulk.add(mp);
+		}
+		else
+		{
+			info records;
+			info records.getJson("ID");
+			id_aux = records.getJson("ID");
+			mp = Map();
+			mp.put("id",id);
+			mp.put("Id_Aux_check",id_aux.toString());
+			mp.put("Verifica_Id",TRUE);
+			info mp;
+			listbulk.add(mp);
+			// 			info listbulk;
+		}
+		if(listbulk.size() == 100)
+		{
+			response = zoho.crm.bulkUpdate(modulo,listbulk);
+			//info response;
+			listbulk = list();
+		}
+	}
+}
+if(!listbulk.isEmpty())
+{
+	//caso esteja com menos de 100
+	response = zoho.crm.bulkUpdate(modulo,listbulk);
+	info "menos de 100";
+	// 	info response;
+}
