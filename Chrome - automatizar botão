@@ -1,0 +1,7 @@
+// salvar botao como variavel global no Chrome
+
+function clicarBotao() {
+    temp1.click();
+    setTimeout(clicarBotao, 300000); // 300000 ms = 5 minutos
+}
+clicarBotao();
