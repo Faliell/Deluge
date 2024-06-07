@@ -1,0 +1,131 @@
+//-> Endpoint utilizado pela Deloitte
+// {
+// "Cliente": {
+// "userId": 99999999,
+// "email": "email@email.com",
+// "name": "Nome Apelido1 Apelido2",
+// "phoneCode": "351",
+// "phoneNumber": "919999999",
+// "birthDate": "1999-12-31",
+// "gender": "M",
+// "identificationCard": "12345678",
+// "cetelemCard": "236545645754",
+// "loyaltyCardNumber": "547568765867867",
+// "origin": "caetanogo",
+// "promoter": "",
+// "accountConfirmed": "false",
+// "subscriptionDate": "2022-03- 23 17:17:30",
+// }
+// }
+sendAlertEmail = false;
+try 
+{
+	crmAPIRequestMap = crmAPIRequest.toMap();
+	request_body = crmAPIRequestMap.getJson("body").toJSONList();
+	//info request_body;
+	//para efeitos de teste
+	// sendmail
+	// [
+	// 	from: zoho.adminuserid
+	// 	to: "joaobaptista@loba.com"
+	// 	subject: "Api test"
+	// 	message: crmAPIRequest
+	// ]
+	// return "";
+	body = request_body.getJson("Cliente");
+	//dados a actualizar
+	//caetano go id
+	userId = body.getJson("userId");
+	//email
+	email = body.getJson("email");
+	//nome
+	name = body.getJson("name");
+	//código telefone
+	phoneCode = body.getJson("phoneCode");
+	//numero telefone
+	phoneNumber = body.getJson("phoneNumber");
+	//data nascimento
+	birthDate = body.getJson("birthDate");
+	//género
+	gender = body.getJson("gender");
+	//cartão identificação
+	identificationCard = body.getJson("identificationCard");
+	//cartao cetelem
+	cetelemCard = body.getJson("cetelemCard");
+	//numero loyalty
+	loyaltyCardNumber = body.getJson("loyaltyCardNumber");
+	//origem subscrição
+	origin = body.getJson("origin");
+	//promotor
+	promoter = body.getJson("promoter");
+	//confirmação da conta
+	accountConfirmed = body.getJson("accountConfirmed");
+	//data de subscrição // formato "2019-05-16 17:17:26.0"
+	subscriptionDate = body.getJson("subscriptionDate");
+	if(userId == "")
+	{
+		//resposta error
+		responseMap = Map();
+		responseMap.put("message","error");
+		//responseMap.put("idZoho", id_cliente);
+		responseMap.put("messageError","Cliente não identificado");
+		//return "email não identificado";
+		return responseMap;
+	}
+	//adicionar novos dados
+	dadosCliente = Map();
+	//passar os dados necessários do Cliente
+	dadosCliente.put("ID_Utilizador_Caetano_Go",userId);
+	dadosCliente.put("Email",email);
+	dadosCliente.put("Last_Name",name);
+	dadosCliente.put("FirstName",name.toList(" ").get(0));
+	dadosCliente.put("telemovel_cod_pais",phoneCode);
+	dadosCliente.put("telemovel_numero",phoneNumber);
+	if(birthDate != null && birthDate != "" && birthDate != "0000-00-00")
+	{
+		dadosCliente.put("Data_Nascimento_Site",toDate(birthDate));
+	}
+	dadosCliente.put("genero",gender);
+	dadosCliente.put("ID_Nacional",identificationCard);
+	dadosCliente.put("numero_cartao_credito_site",cetelemCard);
+	dadosCliente.put("loyalty_card_number_site",loyaltyCardNumber);
+	dadosCliente.put("origin",origin);
+	dadosCliente.put("promoter",promoter);
+	dadosCliente.put("account_confirmed",IF(accountConfirmed == "true",true,false));
+	if(subscriptionDate != null && subscriptionDate != "" && subscriptionDate != "0000-00-00")
+	{
+		dadosCliente.put("Data_de_Subscri_o",toDate(subscriptionDate));
+	}
+	new_record = zoho.crm.createRecord("Contacts",dadosCliente);
+	//info new_record;
+	//resposta success
+	responseMap = Map();
+	responseMap.put("message",new_record);
+	responseMap.put("idZoho",new_record.getJson("id"));
+	responseMap.put("Caetano Go Id",userId);
+	responseMap.put("Email",email);
+}
+catch (error)
+{
+	returnMap = Collection();
+	// RETURN
+	returnMap.insert("code":"error","message":error);
+	sendAlertEmail = true;
+	return returnMap;
+}
+logMap = Map();
+// LOG MAP
+logMap.put("Function_Name","endpoint_createClienteSite");
+logMap.put("Function_Request",request_body);
+logMap.put("Webservice_Name","Delloite");
+logMap.put("Environment","produção");
+logMap.put("Function_Response",responseMap);
+logMap.put("Send_Alert_Email",sendAlertEmail);
+logMap.put("Success",false);
+if(responseMap.getJson("message").getJson("status") != "error")
+{
+	logMap.put("Success",true);
+}
+// logMap.put("Details",{"consentVariables":consentVariables});
+standalone.generic_createLogCreator(logMap);
+return responseMap;
