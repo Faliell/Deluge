@@ -11,4 +11,4 @@ clicarBotao();
 function clicarBotao() {
     temp1.click();
 }
-setInterval(minhaFuncao, 3000);
+setInterval(clicarBotao, 3000);
