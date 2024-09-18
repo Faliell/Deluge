@@ -1,0 +1,12 @@
+/generalMapping = {"ID":"8758","First_Name":"Lucas","Email:":"contacto@loba.com","Phone":"919999999","Age":null,"Email":"lucas@loba.com","VAT_Number":null};
+sendMap = Map();
+for each  key in generalMapping.keys()
+{
+	value = generalMapping.getJSON(key);
+	if(value == "" || value == null)
+	{
+		continue;
+	}
+	sendMap.put(key,value);
+}
+return sendMap;
